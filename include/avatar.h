@@ -65,7 +65,7 @@ const std::string FILE_NAMES[FILE_CNT] =
 };
 
 // const std::string calibration_folder_dir_ = "/home/dyros/data/vive_tracker/calibration_log/dh";  //tocabi 
-const std::string calibration_folder_dir_ = "/home/yong20/Downloads";    //yong pc
+const std::string calibration_folder_dir_ = "/home/cha/Downloads";    //yong pc
 
 class AvatarController
 {

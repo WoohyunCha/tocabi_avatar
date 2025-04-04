@@ -240,6 +240,14 @@ void AvatarController::computeSlow()
     {
         if (initial_flag == 1)
         {
+
+            for (int i=0; i<LINK_NUMBER + 1; i++){
+                link_avatar_[i] = rd_.link_[i];
+            }
+            // for (int i = 0; i < 12; i++){
+            //     Initial_current_q_(i) = rd_.q_[i];
+            // }
+
             //Initialize settings for Task Control! 
 
             start_time_ = rd_cc_.control_time_us_;
@@ -5028,6 +5036,7 @@ void AvatarController::updateFootstepCommand(){
 
             }
             else{
+                current_step_number =0; // load command in a loop
                 step_length_x_(step) = 0.;
                 step_length_y_(step) = (2*phase_indicator_(step) - 1) *0.21;
                 step_yaw_(step) = 0.;
