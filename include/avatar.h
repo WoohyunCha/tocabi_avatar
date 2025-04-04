@@ -1585,7 +1585,7 @@ public:
 
     bool ideal_preview = false;
 
-    bool eval_mode = false; // Genearate a fixed set of commands. For comparison between methods.
+    bool eval_mode = true; // Genearate a fixed set of commands. For comparison between methods.
     int current_step_number = 0;
     int planned_step_number = 12;
     Eigen::VectorXd step_length_x_planned;

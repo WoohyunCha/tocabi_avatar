@@ -5011,6 +5011,7 @@ void AvatarController::updateFootstepCommand(){
 
 
         walking_tick = 0;
+        current_step_number++;
 
         if (eval_mode){
             
@@ -5044,7 +5045,6 @@ void AvatarController::updateFootstepCommand(){
             // step_yaw_(0) += yaw_error;
 
         }
-        current_step_number++;
 
         calculateFootStepTotal();
 
