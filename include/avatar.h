@@ -1344,13 +1344,9 @@ public:
                                     ? num_state + encoder_dim_
                                     : num_state;
     std::ofstream writeFile;
-    std::ofstream evalFile;
-    std::ofstream actuator_data_file;
-    bool actuator_net_log = true;
-
     float phase_ = 0.0;
 
-    bool is_on_robot_ = false;
+    bool is_on_robot_ = true;
     bool is_write_file_ = true;
     Eigen::Matrix<double, MODEL_DOF, 1> q_dot_lpf_;
 
@@ -1396,8 +1392,6 @@ public:
 
     std::string base_path = "";
     std::string loadPathFromConfig(const std::string &config_file);
-    void loadCommand(const std::string &command_file);
-
 
     // BIPED WALKING PARAMETER
     void walkingParameterSetting();
@@ -1585,9 +1579,7 @@ public:
 
     bool ideal_preview = false;
 
-    bool eval_mode = false; // Genearate a fixed set of commands. For comparison between methods.
     int current_step_number = 0;
-    int planned_step_number = 12;
     Eigen::VectorXd step_length_x_planned;
     Eigen::VectorXd step_length_y_planned;
     Eigen::VectorXd step_yaw_planned;
@@ -1705,6 +1697,14 @@ public:
     void getComTrajectory_mpc();
     void getFootTrajectory(); 
     void getTargetState(); 
+
+    double wrap_to_pi(double angles){
+        angles = fmod(angles, 2*M_PI);
+        if (angles > M_PI){
+          angles -= 2*M_PI;    
+        }
+        return angles;
+      }
     
 private:    
     unsigned int initial_flag = 0;
