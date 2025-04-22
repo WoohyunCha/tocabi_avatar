@@ -57,7 +57,19 @@ AvatarController::AvatarController(RobotData &rd)
     initVariable();
     loadNetwork();
     joy_sub_ = nh_.subscribe<sensor_msgs::Joy>("joy", 10, &AvatarController::joyCallback, this);
-}
+
+    if (is_write_file_)
+    {
+        if (is_on_robot_)
+        {
+            writeFile.open("/home/dyros/catkin_ws/src/tocabi_cc/result/data.csv", std::ofstream::out);
+        }
+        else
+        {
+            writeFile.open("/home/cha/catkin_ws/src/tocabi_cc/result/data.csv", std::ofstream::out);
+        }
+        writeFile << std::fixed << std::setprecision(8);
+    }}
 
 void AvatarController::setGains()
 {
@@ -185,15 +197,20 @@ void AvatarController::setNeuralNetworks()
     n_hidden << 120, 100, 80, 60, 40, 20;
     q_to_input_mapping_vector << 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24;
     initializeScaMlp(larm_upperbody_sca_mlp_, 13, 2, n_hidden, q_to_input_mapping_vector);
-    // loadScaNetwork(larm_upperbody_sca_mlp_, "/home/dyros/catkin_ws/src/tocabi_avatar/sca_mlp/larm_upperbody/");
-    loadScaNetwork(larm_upperbody_sca_mlp_, "/home/cha/catkin_ws/src/tocabi_avatar/sca_mlp/larm_upperbody/");
+    if (is_on_robot_)
+        loadScaNetwork(larm_upperbody_sca_mlp_, "/home/dyros/catkin_ws/src/tocabi_avatar/sca_mlp/larm_upperbody/");
+    else
+        loadScaNetwork(larm_upperbody_sca_mlp_, "/home/cha/catkin_ws/src/tocabi_avatar/sca_mlp/larm_upperbody/");
     //////////////////////////////////////////////////////////////////////////////
 
     ///// Between Right Arm and Upperbody & Head Collision Detection Network /////
     n_hidden << 120, 100, 80, 60, 40, 20;
     q_to_input_mapping_vector << 12, 13, 14, 25, 26, 27, 28, 29, 30, 31, 32, 23, 24;
     initializeScaMlp(rarm_upperbody_sca_mlp_, 13, 2, n_hidden, q_to_input_mapping_vector);
-    loadScaNetwork(rarm_upperbody_sca_mlp_, "/home/cha/catkin_ws/src/tocabi_avatar/sca_mlp/rarm_upperbody/");
+    if (is_on_robot_)
+        loadScaNetwork(rarm_upperbody_sca_mlp_, "/home/dyros/catkin_ws/src/tocabi_avatar/sca_mlp/rarm_upperbody/");
+    else
+        loadScaNetwork(rarm_upperbody_sca_mlp_, "/home/cha/catkin_ws/src/tocabi_avatar/sca_mlp/rarm_upperbody/");
     //////////////////////////////////////////////////////////////////////////////
 
     ///// Between Arms Collision Detection Network /////
@@ -400,7 +417,62 @@ void AvatarController::computeSlow()
                 }
 
             }         
+            if (is_write_file_)
 
+            {
+
+                    // writeFile << (rd_cc_.control_time_us_ - time_inference_pre_)/1e6 << "\t";
+
+                    // // writeFile << DyrosMath::minmax_cut(rl_action_(num_action-1)*1/100.0, 0.0, 1/100.0) << "\t";
+
+
+
+                    // // writeFile << rd_cc_.LF_FT.transpose() << "\t";
+
+                    // // writeFile << rd_cc_.RF_FT.transpose() << "\t";
+
+                    // writeFile << rd_cc_.LF_CF_FT.transpose() << "\t";
+
+                    // writeFile << rd_cc_.RF_CF_FT.transpose() << "\t";
+
+
+
+                    // writeFile << rd_cc_.torque_desired.transpose()  << "\t";
+
+                    writeFile << q_noise_.transpose() << "\t";
+
+                    // writeFile << q_dot_lpf_.transpose() << "\t";
+
+                    // writeFile << base_lin_vel.transpose() << "\t" << base_ang_vel.transpose() << "\t" << rd_cc_.q_dot_virtual_.segment(6,33).transpose() << "\t";
+
+                    // writeFile << rd_cc_.q_virtual_.transpose() << "\t";
+
+                    // writeFile << heading << "\t";
+
+
+
+                    // writeFile << value_ << "\t" << stop_by_value_thres_ << "\t";
+
+                    // writeFile << target_swing_state_stance_frame_.transpose() << "\t";
+
+                    // writeFile << target_com_state_stance_frame_.transpose() << "\t";
+
+                    // writeFile << swing_state_stance_frame_.transpose() << "\t";
+
+                    // writeFile << com_state_stance_frame_.transpose() << "\t";
+
+                    // writeFile << q_leg_desired_.transpose() << "\t";
+
+                    // writeFile << ref_zmp_(walking_tick,0) << "\t";
+
+                    // writeFile << ref_zmp_(walking_tick, 1) << "\t";
+
+                    
+
+                    // else writeFile << hidden_layer2_.transpose() << "\t";
+
+                    writeFile << std::endl;
+            }
             time_inference_pre_ = rd_cc_.control_time_us_;
         }
         
@@ -5781,9 +5853,9 @@ void AvatarController::getTargetState(){
     target_com_state_stance_frame_(12) = ref_com_yawvel_(walking_tick+1);
 
     if (com_height_ == 0.68){
-        target_com_state_float_frame_.translation() << DyrosMath::minmax_cut((rd_cc_.link_[Pelvis].rotm.transpose() * (rd_cc_.link_[Pelvis].xpos-rd_cc_.link_[COM_id].xpos))(0), -0.15, 0.),
-        DyrosMath::minmax_cut((rd_cc_.link_[Pelvis].rotm.transpose() * (rd_cc_.link_[Pelvis].xpos-rd_cc_.link_[COM_id].xpos))(1), -0.02, 0.02), 
-        DyrosMath::minmax_cut((rd_cc_.link_[Pelvis].rotm.transpose() * (rd_cc_.link_[Pelvis].xpos-rd_cc_.link_[COM_id].xpos))(2), 0., 0.04);
+        target_com_state_float_frame_.translation() << (rd_cc_.link_[Pelvis].rotm.transpose() * (rd_cc_.link_[Pelvis].xpos-rd_cc_.link_[COM_id].xpos))(0),
+        (rd_cc_.link_[Pelvis].rotm.transpose() * (rd_cc_.link_[Pelvis].xpos-rd_cc_.link_[COM_id].xpos))(1), 
+        (rd_cc_.link_[Pelvis].rotm.transpose() * (rd_cc_.link_[Pelvis].xpos-rd_cc_.link_[COM_id].xpos))(2);
 
     }
     else if (com_height_ == 0.728){
