@@ -53,10 +53,6 @@ AvatarController::AvatarController(RobotData &rd)
     first_loop_qp_retargeting_ = true;
     first_loop_camhqp_ = true;
 
-    // RL-based Walking Initialization
-    initVariable();
-    loadNetwork();
-    joy_sub_ = nh_.subscribe<sensor_msgs::Joy>("joy", 10, &AvatarController::joyCallback, this);
 
     if (is_write_file_)
     {
@@ -258,6 +254,10 @@ void AvatarController::computeSlow()
         if (initial_flag == 1)
         {
 
+            // RL-based Walking Initialization
+            initVariable();
+            loadNetwork();
+            joy_sub_ = nh_.subscribe<sensor_msgs::Joy>("joy", 10, &AvatarController::joyCallback, this);
             for (int i=0; i<LINK_NUMBER + 1; i++){
                 link_avatar_[i] = rd_.link_[i];
             }

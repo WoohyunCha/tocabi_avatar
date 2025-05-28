@@ -1346,7 +1346,7 @@ public:
     std::ofstream writeFile;
     float phase_ = 0.0;
 
-    bool is_on_robot_ = true;
+    bool is_on_robot_ = false;
     bool is_write_file_ = true;
     Eigen::Matrix<double, MODEL_DOF, 1> q_dot_lpf_;
 
